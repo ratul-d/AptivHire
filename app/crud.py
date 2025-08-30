@@ -18,7 +18,7 @@ def create_job(db:Session, job:schemas.JobBase):
 
 
 def get_jobs(db: Session,skip: int=0,limit: int=100):
-    return db.query(models.Job).offset(skip).limit(limit).all
+    return db.query(models.Job).offset(skip).limit(limit).all()
 
 def get_job_by_id(db: Session,job_id: int):
     return db.query(models.Job).filter(models.Job.id == job_id).first()
@@ -40,8 +40,8 @@ def create_candidate(db: Session,candidate:schemas.CandidateBase):
     db.refresh(db_candidate)
     return db_candidate
 
-def get_candidates(db: Session,skip: int=0,limit: int=0):
-    return db.query(models.Candidate).offset(skip).limit(limit).all
+def get_candidates(db: Session,skip: int=0,limit: int=100):
+    return db.query(models.Candidate).offset(skip).limit(limit).all()
 
 def get_candidates_by_id(db:Session,candidate_id: int):
     return db.query(models.Candidate).filter(models.Candidate.candidate_id == candidate_id).first()
@@ -60,8 +60,8 @@ def create_match(db: Session, match: schemas.MatchBase):
     db.refresh(db_match)
     return db_match
 
-def get_matches(db: Session,skip: int=0,limit: int=0):
-    return db.query(models.Match).offset(skip).limit(limit).all
+def get_matches(db: Session,skip: int=0,limit: int=100):
+    return db.query(models.Match).offset(skip).limit(limit).all()
 
 def get_matches_by_id(db:Session,job_id: int):
     return db.query(models.Match).filter(models.Match.job_id == job_id).all()
@@ -82,8 +82,8 @@ def create_interview(db: Session,interview: schemas.InterviewBase):
     db.refresh(db_interview)
     return db_interview
 
-def get_interviews(db: Session,skip: int=0,limit: int=0):
-    return db.query(models.Interview).offset(skip).limit(limit).all
+def get_interviews(db: Session,skip: int=0,limit: int=100):
+    return db.query(models.Interview).offset(skip).limit(limit).all()
 
 def get_interviews_by_id(db:Session,candidate_id: int):
     return db.query(models.Interview).filter(models.Interview.candidate_id == candidate_id).all()
