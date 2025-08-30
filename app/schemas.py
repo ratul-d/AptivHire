@@ -12,6 +12,11 @@ class JobBase(BaseModel):
     class Config:
         orm_mode = True
 
+class Job(JobBase):
+    id: int
+    class Config:
+        orm_mode = True
+
 class CandidateBase(BaseModel):
     name: Optional[str] = None
     email: Optional[EmailStr] = None
@@ -24,12 +29,22 @@ class CandidateBase(BaseModel):
     class Config:
         orm_mode = True
 
+class Candidate(CandidateBase):
+    id: int
+    class Config:
+        orm_mode = True
+
 class MatchBase(BaseModel):
     job_id: Optional[int] = None
     candidate_id: Optional[int] = None
     match_score: Optional[float] = None
     missing_skills: Optional[str] = None
 
+    class Config:
+        orm_mode = True
+
+class Match(MatchBase):
+    id: int
     class Config:
         orm_mode = True
 
@@ -42,3 +57,8 @@ class InterviewBase(BaseModel):
 
     class Config:
         orm_mode=True
+
+class Interview(InterviewBase):
+    id: int
+    class Config:
+        orm_mode = True
