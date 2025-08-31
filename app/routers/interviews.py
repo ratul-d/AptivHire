@@ -15,7 +15,7 @@ def read_interviews(skip: int=0,limit: int=100,db: Session=Depends(get_db)):
 
 @router.get("/{candidate_id}",response_model=schemas.Interview)
 def read_interviews_by_id(candidate_id: int,db: Session=Depends(get_db)):
-    db_candidate = crud.get_candidates_by_id(db=db,candidate_id=candidate_id)
+    db_candidate = crud.get_interviews_by_id(db=db,candidate_id=candidate_id)
     if not db_candidate:
         raise HTTPException(status_code=404,detail="Interview not found for this candidate ID")
     return db_candidate

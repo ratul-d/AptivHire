@@ -44,14 +44,14 @@ def get_candidates(db: Session,skip: int=0,limit: int=100):
     return db.query(models.Candidate).offset(skip).limit(limit).all()
 
 def get_candidates_by_id(db:Session,candidate_id: int):
-    return db.query(models.Candidate).filter(models.Candidate.candidate_id == candidate_id).first()
+    return db.query(models.Candidate).filter(models.Candidate.id == candidate_id).first()
 
 
 # Match CRUD
 def create_match(db: Session, match: schemas.MatchBase):
     db_match = models.Match(
         job_id=match.job_id,
-        cnadidate_id=match.candidate_id,
+        candidate_id=match.candidate_id,
         match_score = match.match_score,
         missing_skills = match.missing_skills
     )
@@ -64,7 +64,7 @@ def get_matches(db: Session,skip: int=0,limit: int=100):
     return db.query(models.Match).offset(skip).limit(limit).all()
 
 def get_matches_by_id(db:Session,job_id: int):
-    return db.query(models.Match).filter(models.Match.job_id == job_id).all()
+    return db.query(models.Match).filter(models.Match.job_id == job_id).first()
 
 
 # Interview CRUD
@@ -86,4 +86,4 @@ def get_interviews(db: Session,skip: int=0,limit: int=100):
     return db.query(models.Interview).offset(skip).limit(limit).all()
 
 def get_interviews_by_id(db:Session,candidate_id: int):
-    return db.query(models.Interview).filter(models.Interview.candidate_id == candidate_id).all()
+    return db.query(models.Interview).filter(models.Interview.candidate_id == candidate_id).first()
