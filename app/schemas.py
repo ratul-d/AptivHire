@@ -17,6 +17,10 @@ class Job(JobBase):
     class Config:
         orm_mode = True
 
+class JDInput(BaseModel):
+    raw_text: str
+
+
 class CandidateBase(BaseModel):
     name: Optional[str] = None
     email: Optional[EmailStr] = None

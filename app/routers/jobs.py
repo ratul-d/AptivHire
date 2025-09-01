@@ -2,12 +2,19 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..  import crud, schemas
 from ..db import get_db
+from ..agents.jd_agent import jd_agent
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
 @router.post("/",response_model=schemas.Job)
-def create_job(job: schemas.JobBase, db: Session=Depends(get_db)):
-    return crud.create_job(db=db,job=job)
+async def create_job(jd_input: schemas.JDInput, db: Session=Depends(get_db)):
+    try:
+        result = await jd_agent.run(jd_input.raw_text)
+        job_data = result.output.dict()
+
+        return crud.create_job(db=db, job=schemas.JobBase(**job_data))
+    except Exception as e:
+        raise HTTPException(status_code=500,detail=str(e))
 
 @router.get("/",response_model=list[schemas.Job])
 def read_jobs(skip: int=0,limit: int=100, db: Session=Depends(get_db)):
