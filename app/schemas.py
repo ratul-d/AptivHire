@@ -38,6 +38,10 @@ class Candidate(CandidateBase):
     class Config:
         orm_mode = True
 
+class CVInput(BaseModel):
+    raw_text: str
+
+
 class MatchBase(BaseModel):
     job_id: Optional[int] = None
     candidate_id: Optional[int] = None
