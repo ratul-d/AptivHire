@@ -53,7 +53,10 @@ def create_match(db: Session, match: schemas.MatchBase):
         job_id=match.job_id,
         candidate_id=match.candidate_id,
         match_score = match.match_score,
-        missing_skills = match.missing_skills
+        reasoning = match.reasoning,
+        missing_skills = match.missing_skills,
+        missing_experience = match.missing_experience,
+        missing_education = match.missing_education
     )
     db.add(db_match)
     db.commit()
