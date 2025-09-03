@@ -32,7 +32,10 @@ class Match(Base):
     job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False)
     candidate_id = Column(Integer, ForeignKey("candidates.id"), nullable=False)
     match_score = Column(Float, nullable=False)
+    reasoning = Column(Text, nullable=False)
     missing_skills = Column(Text, nullable=True)
+    missing_experience = Column(Text, nullable=True)
+    missing_education = Column(Text, nullable=True)
 
 
 class Interview(Base):

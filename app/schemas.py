@@ -46,7 +46,10 @@ class MatchBase(BaseModel):
     job_id: Optional[int] = None
     candidate_id: Optional[int] = None
     match_score: Optional[float] = None
+    reasoning: Optional[str] = None
     missing_skills: Optional[str] = None
+    missing_experience: Optional[str] = None
+    missing_education: Optional[str] = None
 
     class Config:
         orm_mode = True
