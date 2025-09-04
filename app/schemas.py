@@ -9,13 +9,10 @@ class JobBase(BaseModel):
     education_required: Optional[str] = None
     responsibilities: Optional[str] = None
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 class Job(JobBase):
     id: int
-    class Config:
-        orm_mode = True
 
 class JDInput(BaseModel):
     raw_text: str
@@ -30,13 +27,10 @@ class CandidateBase(BaseModel):
     experience: Optional[str] = None
     certifications: Optional[str] = None
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 class Candidate(CandidateBase):
     id: int
-    class Config:
-        orm_mode = True
 
 class CVInput(BaseModel):
     raw_text: str
@@ -51,13 +45,11 @@ class MatchBase(BaseModel):
     missing_experience: Optional[str] = None
     missing_education: Optional[str] = None
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 class Match(MatchBase):
     id: int
-    class Config:
-        orm_mode = True
+
 
 class InterviewBase(BaseModel):
     candidate_id: Optional[int] = None
@@ -66,10 +58,7 @@ class InterviewBase(BaseModel):
     format: Optional[str] = None
     invite_email: Optional[EmailStr] = None
 
-    class Config:
-        orm_mode=True
+    model_config = {"from_attributes": True}
 
 class Interview(InterviewBase):
     id: int
-    class Config:
-        orm_mode = True
