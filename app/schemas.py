@@ -36,6 +36,13 @@ class CVInput(BaseModel):
     raw_text: str
 
 
+class MatchLLMOutput(BaseModel):
+    match_score: int
+    reasoning: Optional[str] = None
+    missing_skills: Optional[str] = None
+    missing_experience: Optional[str] = None
+    missing_education: Optional[str] = None
+
 class MatchBase(BaseModel):
     job_id: Optional[int] = None
     candidate_id: Optional[int] = None
