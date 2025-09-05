@@ -7,7 +7,7 @@ load_dotenv()
 
 matcher_agent = Agent(
     name="Matcher Agent",
-    model=GroqModel('llama-3.3-70b-versatile'),
+    model=GroqModel('openai/gpt-oss-120b'),
     output_type=MatchLLMOutput,
     system_prompt=(
         """You are a strict job-candidate matching assistant.\n
