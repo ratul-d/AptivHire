@@ -1,4 +1,4 @@
-from sqlalchemy import Column,Integer,String,Text,ForeignKey,Float
+from sqlalchemy import Column,Integer,String,Text,ForeignKey,Float,DateTime
 from .db import Base
 
 class Job(Base):
@@ -44,6 +44,6 @@ class Interview(Base):
     id = Column(Integer, primary_key=True, index=True)
     candidate_id = Column(Integer, ForeignKey("candidates.id"), nullable=False)
     job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False)
-    interview_time = Column(String, nullable=False)
+    interview_time = Column(DateTime(timezone=True), nullable=False)
     format = Column(String, nullable=False)   #EG: "online", "onsite"
     invite_email = Column(String, nullable=False)
