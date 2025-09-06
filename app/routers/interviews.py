@@ -1,14 +1,15 @@
 from fastapi import APIRouter,HTTPException,Depends
 from sqlalchemy.orm import Session
-from .. import schemas,crud
-from ..db import get_db
-from ..agents.scheduler import interview_email_agent
-from ..utils.email_sender import send_email
+from app import crud
+from app.schemas import interview_schema, job_schema, candidate_schema
+from app.db import get_db
+from app.agents.scheduler import interview_email_agent
+from app.utils.email_sender import send_email
 
 router = APIRouter(prefix="/interviews",tags=["Interviews"])
 
-@router.post("/",response_model=schemas.Interview)
-async def create_interview(interview: schemas.InterviewPOSTEndpoint, db: Session=Depends(get_db)):
+@router.post("/",response_model=interview_schema.Interview)
+async def create_interview(interview: interview_schema.InterviewPOSTEndpoint, db: Session=Depends(get_db)):
     job = crud.get_job_by_id(db=db, job_id=interview.job_id)
     if not job:
         raise HTTPException(status_code=404, detail=f"Job {interview.job_id} not found")
@@ -17,8 +18,8 @@ async def create_interview(interview: schemas.InterviewPOSTEndpoint, db: Session
     if not candidate:
         raise HTTPException(status_code=404, detail=f"Candidate {interview.candidate_id} not found")
 
-    job_dict = schemas.Job.model_validate(job).model_dump()
-    candidate_dict = schemas.Candidate.model_validate(candidate).model_dump()
+    job_dict = job_schema.Job.model_validate(job).model_dump()
+    candidate_dict = candidate_schema.Candidate.model_validate(candidate).model_dump()
 
     job_no_id = {k: v for k, v in job_dict.items() if k != "id"}
     candidate_no_id = {k: v for k, v in candidate_dict.items() if k != "id"}
@@ -61,15 +62,15 @@ async def create_interview(interview: schemas.InterviewPOSTEndpoint, db: Session
         "invite_email": candidate_dict["email"]
     }
     try:
-        return crud.create_interview(db=db,interview=schemas.InterviewBase(**interview_payload))
+        return crud.create_interview(db=db,interview=interview_schema.InterviewBase(**interview_payload))
     except Exception as e:
         raise HTTPException(status_code=500,detail=f"Error at interview db insertion:{e}")
 
-@router.get("/",response_model=list[schemas.Interview])
+@router.get("/",response_model=list[interview_schema.Interview])
 def read_interviews(skip: int=0,limit: int=100,db: Session=Depends(get_db)):
     return crud.get_interviews(db=db,skip=skip,limit=limit)
 
-@router.get("/{candidate_id}",response_model=schemas.Interview)
+@router.get("/{candidate_id}",response_model=list[interview_schema.Interview])
 def read_interviews_by_id(candidate_id: int,db: Session=Depends(get_db)):
     db_candidate = crud.get_interviews_by_id(db=db,candidate_id=candidate_id)
     if not db_candidate:

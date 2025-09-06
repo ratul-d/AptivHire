@@ -1,14 +1,14 @@
 from pydantic_ai import Agent
 from pydantic_ai.models.groq import GroqModel
 from dotenv import load_dotenv
-from app.schemas import MatchLLMOutput
+from app.schemas import match_schema
 
 load_dotenv()
 
 matcher_agent = Agent(
     name="Matcher Agent",
     model=GroqModel('openai/gpt-oss-120b'),
-    output_type=MatchLLMOutput,
+    output_type=match_schema.MatchLLMOutput,
     system_prompt=(
         """You are a strict job-candidate matching assistant.\n
         You will be given two objects: one job description and one candidate CV.\n\n

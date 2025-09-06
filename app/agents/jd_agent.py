@@ -1,6 +1,6 @@
 from pydantic_ai import Agent
 from pydantic_ai.models.groq import GroqModel
-from app.schemas import JobBase
+from app.schemas import job_schema
 from dotenv import load_dotenv
 
 
@@ -9,7 +9,7 @@ load_dotenv()
 jd_agent = Agent(
     name="JD Summarizer",
     model =GroqModel('llama-3.3-70b-versatile'),
-    output_type=JobBase,
+    output_type=job_schema.JobBase,
     system_prompt=(
         """Extract job details from the given job description.
         Respond ONLY with a valid JSON object that strictly matches this schema:

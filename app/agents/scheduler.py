@@ -1,14 +1,14 @@
 from pydantic_ai import Agent
 from pydantic_ai.models.groq import GroqModel
 from dotenv import load_dotenv
-from app.schemas import EmailContent
+from app.schemas import interview_schema
 
 load_dotenv()
 
 interview_email_agent = Agent(
     name="Interview Email Agent",
     model=GroqModel('openai/gpt-oss-120b'),
-    output_type=EmailContent,
+    output_type=interview_schema.EmailContent,
     system_prompt=(
             """You are an AI-powered interview scheduling assistant.
     
@@ -26,8 +26,8 @@ interview_email_agent = Agent(
             "recipient_email": string
           }
         - Please format the interview date and time in a friendly, readable format for the candidate, 
-        e.g. "Friday, September 5th, 2025 at 6:45 PM
-        - Convert end timezone to CODE
+        e.g. "September 5th, 2025 at 6:45 PM
+        - Convert the given UTC offset into the standard timezone code (e.g., +05:30 → IST)
     
         Guidelines for email generation:
         - Use a warm, respectful, and professional tone.

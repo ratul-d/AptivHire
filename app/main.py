@@ -1,6 +1,6 @@
 from fastapi import  FastAPI
-from .db import Base,engine
-from .routers import jobs,candidates,matches,interviews
+from app.db import Base,engine
+from app.routers import jobs,candidates,matches,interviews
 
 Base.metadata.create_all(bind = engine)
 

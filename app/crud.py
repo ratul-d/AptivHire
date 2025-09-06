@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
-from . import models, schemas
+from app import models
+from app.schemas import job_schema,candidate_schema,match_schema,interview_schema
 
 # Job CRUD
-def create_job(db:Session, job:schemas.JobBase):
+def create_job(db:Session, job:job_schema.JobBase):
     db_job = models.Job(
         title = job.title,
         summary = job.summary,
@@ -25,7 +26,7 @@ def get_job_by_id(db: Session,job_id: int):
 
 
 # Candidate CRUD
-def create_candidate(db: Session,candidate:schemas.CandidateBase):
+def create_candidate(db: Session,candidate:candidate_schema.CandidateBase):
     db_candidate = models.Candidate(
         name = candidate.name,
         email = candidate.email,
@@ -48,7 +49,7 @@ def get_candidates_by_id(db:Session,candidate_id: int):
 
 
 # Match CRUD
-def create_match(db: Session, match: schemas.MatchBase):
+def create_match(db: Session, match: match_schema.MatchBase):
     db_match = models.Match(
         job_id=match.job_id,
         candidate_id=match.candidate_id,
@@ -67,11 +68,11 @@ def get_matches(db: Session,skip: int=0,limit: int=100):
     return db.query(models.Match).offset(skip).limit(limit).all()
 
 def get_matches_by_id(db:Session,job_id: int):
-    return db.query(models.Match).filter(models.Match.job_id == job_id).first()
+    return db.query(models.Match).filter(models.Match.job_id == job_id).all()
 
 
 # Interview CRUD
-def create_interview(db: Session,interview: schemas.InterviewBase):
+def create_interview(db: Session,interview: interview_schema.InterviewBase):
     db_interview = models.Interview(
         candidate_id = interview.candidate_id,
         job_id = interview.job_id,
@@ -89,4 +90,4 @@ def get_interviews(db: Session,skip: int=0,limit: int=100):
     return db.query(models.Interview).offset(skip).limit(limit).all()
 
 def get_interviews_by_id(db:Session,candidate_id: int):
-    return db.query(models.Interview).filter(models.Interview.candidate_id == candidate_id).first()
+    return db.query(models.Interview).filter(models.Interview.candidate_id == candidate_id).all()

@@ -1,6 +1,6 @@
 from pydantic_ai import Agent
 from pydantic_ai.models.groq import GroqModel
-from app.schemas import CandidateBase
+from app.schemas import candidate_schema
 from dotenv import load_dotenv
 
 
@@ -9,7 +9,7 @@ load_dotenv()
 cv_agent = Agent(
     name="Profile Extractor",
     model=GroqModel('llama-3.3-70b-versatile'),
-    output_type=CandidateBase,
+    output_type=candidate_schema.CandidateBase,
     system_prompt=(
         """Extract candidate details from the given resume.
         Respond ONLY with a valid JSON object that strictly matches this schema:

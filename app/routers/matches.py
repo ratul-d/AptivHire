@@ -1,12 +1,13 @@
 from fastapi import APIRouter,HTTPException,Depends
 from sqlalchemy.orm import Session
-from .. import crud,schemas
-from ..db import get_db
-from ..agents.matcher import matcher_agent
+from app import crud
+from app.schemas import match_schema, job_schema, candidate_schema
+from app.db import get_db
+from app.agents.matcher import matcher_agent
 
 router = APIRouter(prefix="/matches",tags=["Matches"])
 
-@router.post("/",response_model=schemas.Match)
+@router.post("/",response_model=match_schema.Match)
 async def create_match(job_id: int, candidate_id: int,db: Session=Depends(get_db)):
     job = crud.get_job_by_id(db=db,job_id=job_id)
     if not job:
@@ -16,8 +17,8 @@ async def create_match(job_id: int, candidate_id: int,db: Session=Depends(get_db
     if not candidate:
         raise HTTPException(status_code=404,detail=f"Candidate {candidate_id} not found")
 
-    job_dict = schemas.Job.model_validate(job).model_dump()
-    candidate_dict = schemas.Candidate.model_validate(candidate).model_dump()
+    job_dict = job_schema.Job.model_validate(job).model_dump()
+    candidate_dict = candidate_schema.Candidate.model_validate(candidate).model_dump()
 
     job_no_id = {k: v for k, v in job_dict.items() if k != "id"}
     candidate_no_id = {k: v for k, v in candidate_dict.items() if k != "id"}
@@ -43,15 +44,15 @@ async def create_match(job_id: int, candidate_id: int,db: Session=Depends(get_db
             **match_data
         }
 
-        return crud.create_match(db=db,match=schemas.MatchBase(**match_payload))
+        return crud.create_match(db=db,match=match_schema.MatchBase(**match_payload))
     except Exception as e:
         raise HTTPException(status_code=500,detail=str(e))
 
-@router.get("/",response_model=list[schemas.Match])
+@router.get("/",response_model=list[match_schema.Match])
 def read_matches(skip: int=0,limit: int=100,db: Session=Depends(get_db)):
     return crud.get_matches(db=db,skip=skip,limit=limit)
 
-@router.get("/{job_id}",response_model=schemas.Match)
+@router.get("/{job_id}",response_model=list[match_schema.Match])
 def read_matches_by_id(job_id: int,db: Session=Depends(get_db)):
     db_match = crud.get_matches_by_id(db=db,job_id=job_id)
     if not db_match:
