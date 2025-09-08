@@ -4,7 +4,9 @@ from typing import Optional
 
 class MatchBase(BaseModel):
     job_id: Optional[int] = None
+    job_title: Optional[str] = None
     candidate_id: Optional[int] = None
+    candidate_name: Optional[str] = None
     match_score: Optional[float] = None
     reasoning: Optional[str] = None
     missing_skills: Optional[str] = None
@@ -23,3 +25,7 @@ class MatchLLMOutput(BaseModel):
     missing_skills: Optional[str] = None
     missing_experience: Optional[str] = None
     missing_education: Optional[str] = None
+
+class MatchPOSTEndpoint(BaseModel):
+    job_id: Optional[int] = None
+    candidate_id: Optional[int] = None
