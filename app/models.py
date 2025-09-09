@@ -45,7 +45,9 @@ class Interview(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     candidate_id = Column(Integer, ForeignKey("candidates.id"), nullable=False)
+    candidate_name = Column(Text, nullable=False)
     job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False)
+    job_title = Column(Text, nullable=False)
     interview_time = Column(DateTime(timezone=True), nullable=False)
     format = Column(String, nullable=False)   #EG: "online", "onsite"
     invite_email = Column(String, nullable=False)

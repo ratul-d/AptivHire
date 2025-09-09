@@ -7,7 +7,9 @@ IST = ZoneInfo("Asia/Kolkata")
 
 class InterviewBase(BaseModel):
     candidate_id: Optional[int] = None
+    candidate_name: Optional[str] = None
     job_id: Optional[int] = None
+    job_title: Optional[str] = None
     interview_time: Optional[datetime] = None
     format: Optional[str] = None
     invite_email: Optional[EmailStr] = None
