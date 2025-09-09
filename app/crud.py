@@ -52,7 +52,9 @@ def get_candidates_by_id(db:Session,candidate_id: int):
 def create_match(db: Session, match: match_schema.MatchBase):
     db_match = models.Match(
         job_id=match.job_id,
+        job_title=match.job_title,
         candidate_id=match.candidate_id,
+        candidate_name=match.candidate_name,
         match_score = match.match_score,
         reasoning = match.reasoning,
         missing_skills = match.missing_skills,
@@ -67,15 +69,19 @@ def create_match(db: Session, match: match_schema.MatchBase):
 def get_matches(db: Session,skip: int=0,limit: int=100):
     return db.query(models.Match).offset(skip).limit(limit).all()
 
-def get_matches_by_id(db:Session,job_id: int):
-    return db.query(models.Match).filter(models.Match.job_id == job_id).all()
+def get_matches_by_job_and_candidate_id(db:Session,job_id: int, candidate_id: int):
+    return db.query(models.Match).filter(
+            models.Match.job_id == job_id,
+            models.Match.candidate_id == candidate_id).first()
 
 
 # Interview CRUD
 def create_interview(db: Session,interview: interview_schema.InterviewBase):
     db_interview = models.Interview(
         candidate_id = interview.candidate_id,
+        candidate_name = interview.candidate_name,
         job_id = interview.job_id,
+        job_title = interview.job_title,
         interview_time = interview.interview_time,
         format = interview.format,
         invite_email = interview.invite_email
@@ -89,5 +95,7 @@ def create_interview(db: Session,interview: interview_schema.InterviewBase):
 def get_interviews(db: Session,skip: int=0,limit: int=100):
     return db.query(models.Interview).offset(skip).limit(limit).all()
 
-def get_interviews_by_id(db:Session,candidate_id: int):
-    return db.query(models.Interview).filter(models.Interview.candidate_id == candidate_id).all()
+def get_interviews_by_job_and_candidate_id(db:Session,job_id: int,candidate_id: int):
+    return db.query(models.Interview).filter(
+        models.Interview.job_id == job_id,
+        models.Interview.candidate_id == candidate_id).first()
