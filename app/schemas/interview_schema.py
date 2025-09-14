@@ -6,6 +6,7 @@ from zoneinfo import ZoneInfo
 IST = ZoneInfo("Asia/Kolkata")
 
 class InterviewBase(BaseModel):
+    user_id: int
     candidate_id: Optional[int] = None
     candidate_name: Optional[str] = None
     job_id: Optional[int] = None

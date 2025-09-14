@@ -9,7 +9,7 @@ load_dotenv()
 cv_agent = Agent(
     name="Profile Extractor",
     model=GroqModel('llama-3.3-70b-versatile'),
-    output_type=candidate_schema.CandidateBase,
+    output_type=candidate_schema.CVOutput,
     system_prompt=(
         """Extract candidate details from the given resume.
         Respond ONLY with a valid JSON object that strictly matches this schema:

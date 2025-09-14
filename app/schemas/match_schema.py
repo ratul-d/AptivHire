@@ -3,6 +3,7 @@ from typing import Optional
 
 
 class MatchBase(BaseModel):
+    user_id: int
     job_id: Optional[int] = None
     job_title: Optional[str] = None
     candidate_id: Optional[int] = None

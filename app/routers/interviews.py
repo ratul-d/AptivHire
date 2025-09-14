@@ -5,23 +5,26 @@ from app.schemas import interview_schema, job_schema, candidate_schema
 from app.db import get_db
 from app.agents.scheduler import interview_email_agent
 from app.utils.email_sender import send_email
+from app.models import User
+from app.dependencies import get_current_user
+
 
 router = APIRouter(prefix="/interviews",tags=["Interviews"])
 
 @router.post("/",response_model=interview_schema.Interview)
-async def create_interview(interview: interview_schema.InterviewPOSTEndpoint, db: Session=Depends(get_db)):
-    job = crud.get_job_by_id(db=db, job_id=interview.job_id)
+async def create_interview(interview: interview_schema.InterviewPOSTEndpoint, db: Session=Depends(get_db),current_user: User = Depends(get_current_user)):
+    job = crud.get_job_by_id(db=db, job_id=interview.job_id,user_id=current_user["id"])
     if not job:
         raise HTTPException(status_code=404, detail=f"Job {interview.job_id} not found")
 
-    candidate = crud.get_candidates_by_id(db=db, candidate_id=interview.candidate_id)
+    candidate = crud.get_candidates_by_id(db=db, candidate_id=interview.candidate_id,user_id=current_user["id"])
     if not candidate:
         raise HTTPException(status_code=404, detail=f"Candidate {interview.candidate_id} not found")
 
     job_dict = job_schema.Job.model_validate(job).model_dump()
     candidate_dict = candidate_schema.Candidate.model_validate(candidate).model_dump()
 
-    existing_interview = crud.get_interviews_by_job_and_candidate_id(db=db,job_id=interview.job_id,candidate_id=interview.candidate_id)
+    existing_interview = crud.get_interviews_by_job_and_candidate_id(db=db,job_id=interview.job_id,candidate_id=interview.candidate_id,user_id=current_user["id"])
     if existing_interview:
         raise HTTPException(
             status_code=460,
@@ -65,6 +68,7 @@ async def create_interview(interview: interview_schema.InterviewPOSTEndpoint, db
         raise HTTPException(status_code=500,detail="Failed to send interview email")
 
     interview_payload = {
+        "user_id":current_user["id"],
         "candidate_id": candidate_dict["id"],
         "candidate_name": candidate_dict["name"],
         "job_id": job_dict["id"],
@@ -73,19 +77,19 @@ async def create_interview(interview: interview_schema.InterviewPOSTEndpoint, db
         "format": interview.interview_format,
         "invite_email": candidate_dict["email"]
     }
-    print("============"+ candidate_dict["name"])
+
     try:
         return crud.create_interview(db=db,interview=interview_schema.InterviewBase(**interview_payload))
     except Exception as e:
         raise HTTPException(status_code=500,detail=f"Error at interview db insertion:{e}")
 
 @router.get("/",response_model=list[interview_schema.Interview])
-def read_interviews(skip: int=0,limit: int=100,db: Session=Depends(get_db)):
-    return crud.get_interviews(db=db,skip=skip,limit=limit)
+def read_interviews(skip: int=0,limit: int=100,db: Session=Depends(get_db),current_user: User = Depends(get_current_user)):
+    return crud.get_interviews(db=db,skip=skip,limit=limit,user_id=current_user["id"])
 
 @router.get("/{job_id}/{candidate_id}",response_model=interview_schema.Interview)
-def read_interviews_by_job_and_candidate(job_id: int,candidate_id: int,db: Session=Depends(get_db)):
-    db_interview = crud.get_interviews_by_job_and_candidate_id(db=db,job_id=job_id,candidate_id=candidate_id)
+def read_interviews_by_job_and_candidate(job_id: int,candidate_id: int,db: Session=Depends(get_db),current_user: User = Depends(get_current_user)):
+    db_interview = crud.get_interviews_by_job_and_candidate_id(db=db,job_id=job_id,candidate_id=candidate_id,user_id=current_user["id"])
     if not db_interview:
         raise HTTPException(status_code=404,detail=f"No interview found for Job ID {job_id} and Candidate ID {candidate_id}")
     return db_interview

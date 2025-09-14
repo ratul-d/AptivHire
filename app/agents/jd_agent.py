@@ -9,7 +9,7 @@ load_dotenv()
 jd_agent = Agent(
     name="JD Summarizer",
     model =GroqModel('llama-3.3-70b-versatile'),
-    output_type=job_schema.JobBase,
+    output_type=job_schema.JDOutput,
     system_prompt=(
         """Extract job details from the given job description.
         Respond ONLY with a valid JSON object that strictly matches this schema:
