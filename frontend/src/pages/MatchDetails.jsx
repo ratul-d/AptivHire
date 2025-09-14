@@ -1,8 +1,7 @@
 // src/pages/MatchDetails.jsx
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+import { fetchWithAuth, clearTokens } from "../services/auth";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -58,16 +57,23 @@ export default function MatchDetails() {
     }
 
     try {
-      // run three fetches in parallel
-      const jobUrl = `${API_BASE}/jobs/${jobId}`;
-      const candUrl = `${API_BASE}/candidates/${candidateId}`;
-      const matchUrl = `${API_BASE}/matches/${jobId}/${candidateId}`;
+      // use relative paths so fetchWithAuth prefixes API_BASE internally
+      const jobPath = `/jobs/${jobId}`;
+      const candPath = `/candidates/${candidateId}`;
+      const matchPath = `/matches/${jobId}/${candidateId}`;
 
       const [jobRes, candRes, matchRes] = await Promise.all([
-        fetch(jobUrl, { signal: controller.signal }),
-        fetch(candUrl, { signal: controller.signal }),
-        fetch(matchUrl, { signal: controller.signal }),
+        fetchWithAuth(jobPath, { signal: controller.signal }),
+        fetchWithAuth(candPath, { signal: controller.signal }),
+        fetchWithAuth(matchPath, { signal: controller.signal }),
       ]);
+
+      // If any response indicates unauthorized, clear tokens and redirect to login
+      if (jobRes.status === 401 || candRes.status === 401 || matchRes.status === 401) {
+        clearTokens();
+        navigate("/auth", { replace: true });
+        return;
+      }
 
       // JOB
       if (jobRes.ok) {
@@ -96,6 +102,13 @@ export default function MatchDetails() {
         setMatchError(body.detail || `Match fetch failed (${matchRes.status})`);
       }
     } catch (err) {
+      // If fetchWithAuth threw because refresh failed / no token, redirect to auth
+      if (err && (err.message?.includes("Refresh failed") || err.message?.includes("No refresh token") || err.message?.toLowerCase().includes("401"))) {
+        clearTokens();
+        navigate("/auth", { replace: true });
+        return;
+      }
+
       if (err.name !== "AbortError") {
         const msg = err.message || "Network error";
         setJobError((prev) => prev || msg);
@@ -126,7 +139,6 @@ export default function MatchDetails() {
           >
             ← Back
           </button>
-
         </div>
       </div>
 

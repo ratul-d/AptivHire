@@ -1,6 +1,7 @@
 // src/pages/Interviews.jsx
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchWithAuth } from "../services/auth";
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 
@@ -29,10 +30,10 @@ export default function Interviews() {
     return () => {
       if (abortRef.current) abortRef.current.abort();
     };
-    // intentionally depend only on page and pageSize so typing in search boxes doesn't trigger fetch
+    // depend only on page and pageSize so search inputs don't trigger fetch
   }, [page, pageSize]);
 
-  // when interviews array or either search input changes, apply search (client-side)
+  // when interviews array or search inputs change, apply search
   useEffect(() => {
     applySearch(searchJobTitle, searchCandidateName);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -57,9 +58,10 @@ export default function Interviews() {
         skip = (page - 1) * limit;
       }
 
-      const res = await fetch(`${API_BASE}/interviews?skip=${skip}&limit=${limit}`, {
-        signal: controller.signal,
-      });
+      const res = await fetchWithAuth(
+        `${API_BASE}/interviews?skip=${skip}&limit=${limit}`,
+        { signal: controller.signal }
+      );
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -105,17 +107,12 @@ export default function Interviews() {
   /**
    * Apply search filters to the loaded interviews.
    *
-   * Behavior:
-   * - If both jobQuery and candidateQuery empty -> show all loaded interviews.
-   * - Otherwise perform case-insensitive substring matching on job_title and candidate_name fields (client-side).
-   *
    * Both fields matched with AND logic when both present.
    */
   function applySearch(jobQuery, candidateQuery) {
     const jobQ = jobQuery?.toString().trim() ?? "";
     const candQ = candidateQuery?.toString().trim() ?? "";
 
-    // if both empty -> show all
     if (!jobQ && !candQ) {
       setFilteredInterviews(interviews);
       return;
@@ -129,11 +126,9 @@ export default function Interviews() {
         const jobTitleStr = (it.job_title ?? "").toString().toLowerCase();
         const candidateNameStr = (it.candidate_name ?? "").toString().toLowerCase();
 
-        // both present -> require both match (AND)
         if (jobQLower && candQLower) {
           return jobTitleStr.includes(jobQLower) && candidateNameStr.includes(candQLower);
         }
-
         if (jobQLower) return jobTitleStr.includes(jobQLower);
         if (candQLower) return candidateNameStr.includes(candQLower);
         return true;
@@ -141,13 +136,12 @@ export default function Interviews() {
     );
   }
 
-  // compute displayed interviews (filteredInterviews sorted according to sortOrder)
+  // compute displayed interviews (filteredInterviews sorted)
   const displayedInterviews = useMemo(() => {
     const arr = Array.isArray(filteredInterviews) ? [...filteredInterviews] : [];
 
     if (sortOrder === "none") return arr;
 
-    // helper to extract numeric timestamp or null
     const getTime = (item) => {
       const v = item?.interview_time;
       if (!v) return null;
@@ -159,7 +153,6 @@ export default function Interviews() {
       const aT = getTime(a);
       const bT = getTime(b);
 
-      // handle nulls: place nulls at the end for both asc and desc
       if (aT === null && bT === null) return 0;
       if (aT === null) return 1;
       if (bT === null) return -1;
@@ -189,7 +182,7 @@ export default function Interviews() {
         {isExpanded ? full : `${full.slice(0, max)}…`}
         <button
           onClick={(e) => {
-            e.stopPropagation(); // don't trigger tile navigation
+            e.stopPropagation();
             toggleExpand(id);
           }}
           style={{
@@ -218,12 +211,10 @@ export default function Interviews() {
     }
   }
 
-  // navigate to InterviewDetails with job_id and candidate_id in path, interview id as query param
   function openDetails(item) {
     const candidateId = item.candidate_id ?? "";
     const interviewId = item.id ?? "";
     const jobId = item.job_id ?? "";
-    // route: /interviews/:job_id/:candidate_id?interview_id=...
     navigate(`/interviews/${jobId}/${candidateId}?interview_id=${interviewId}`);
   }
 

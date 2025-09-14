@@ -1,10 +1,12 @@
 // src/components/JobPanel.jsx
 import React, { useState } from "react";
-import { postJob } from "../services/api";
+import { useNavigate } from "react-router-dom";
+import { fetchWithAuth, getAccessToken, clearTokens } from "../services/auth";
 
 export default function JobPanel({ currentJob, setCurrentJob, openJobsModal }) {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   function resetView() {
     setText("");
@@ -16,13 +18,40 @@ export default function JobPanel({ currentJob, setCurrentJob, openJobsModal }) {
       alert("Please enter a job description");
       return;
     }
+
+    // ensure user is authenticated before trying
+    if (!getAccessToken()) {
+      clearTokens();
+      navigate("/auth", { replace: true });
+      return;
+    }
+
     setLoading(true);
     try {
       const processedText = text.replace(/\s+/g, " ").trim();
-      const job = await postJob(processedText);
+
+      const res = await fetchWithAuth("/jobs", {
+        method: "POST",
+        body: JSON.stringify({ raw_text: processedText }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          // unauthorized — refresh likely failed or token invalid
+          clearTokens();
+          navigate("/auth", { replace: true });
+          return;
+        }
+        throw new Error(body.detail || `Server responded ${res.status}`);
+      }
+
+      const job = await res.json();
       setCurrentJob(job);
+      // optionally clear input after successful creation:
+      setText("");
     } catch (err) {
-      alert("Error processing job description: " + err.message);
+      alert("Error processing job description: " + (err.message || err));
     } finally {
       setLoading(false);
     }
@@ -37,16 +66,28 @@ export default function JobPanel({ currentJob, setCurrentJob, openJobsModal }) {
         Job Description
       </div>
 
-      <button className="select-existing-button" onClick={() => openJobsModal(true)}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <button className="select-existing-button" onClick={() => openJobsModal(true)}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 5.5C13.66 5.5 15 6.84 15 8.5C15 10.16 13.66 11.5 12 11.5C10.34 11.5 9 10.16 9 8.5C9 6.84 10.34 5.5 12 5.5ZM12 2.5C15.87 2.5 19 5.63 19 9.5C19 13.37 15.87 16.5 12 16.5C8.13 16.5 5 13.37 5 9.5C5 5.63 8.13 2.5 12 2.5ZM12 0.5C7.03 0.5 3 4.53 3 9.5C3 14.47 7.03 18.5 12 18.5C16.97 18.5 21 14.47 21 9.5C21 4.53 16.97 0.5 12 0.5ZM12 20.5C11.45 20.5 11 20.95 11 21.5C11 22.05 11.45 22.5 12 22.5C12.55 22.5 13 22.05 13 21.5C13 20.95 12.55 20.5 12 20.5Z" fill="currentColor"/>
-        </svg>Select Existing</button>
-      <button className="edit-button" style={{ display: currentJob ? "flex" : "none" }} onClick={resetView}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        </svg>
+        Select Existing
+      </button>
+
+      <button className="edit-button" style={{ display: currentJob ? "flex" : "none" }} onClick={resetView}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M3 17.25V21H6.75L17.81 9.94L14.06 6.19L3 17.25ZM20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C17.98 2.9 17.35 2.9 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04Z" fill="currentColor"/>
-        </svg>Edit</button>
+        </svg>
+        Edit
+      </button>
 
       {!currentJob ? (
         <div id="job-input-container">
-          <textarea id="job-description" placeholder="Paste job description here..." value={text} onChange={(e) => setText(e.target.value)} />
+          <textarea
+            id="job-description"
+            placeholder="Paste job description here..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
           <button onClick={processJobDescription} disabled={loading}>
             {loading ? "Processing..." : "Process Job Description"}
           </button>

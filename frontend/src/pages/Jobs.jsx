@@ -1,8 +1,7 @@
 // src/pages/Jobs.jsx
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+import { fetchWithAuth, getAccessToken, clearTokens } from "../services/auth";
 
 export default function Jobs({ setCurrentJob }) {
   const [jobs, setJobs] = useState([]);
@@ -18,6 +17,14 @@ export default function Jobs({ setCurrentJob }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // If there is no access token, send user to auth immediately.
+    if (!getAccessToken()) {
+      // ensure local tokens cleared just in case
+      clearTokens();
+      navigate("/auth", { replace: true });
+      return;
+    }
+
     fetchJobs();
     return () => {
       if (abortRef.current) abortRef.current.abort();
@@ -49,13 +56,23 @@ export default function Jobs({ setCurrentJob }) {
         skip = (page - 1) * limit;
       }
 
-      const res = await fetch(`${API_BASE}/jobs?skip=${skip}&limit=${limit}`, {
-        signal: controller.signal,
-      });
+      // Use fetchWithAuth which attaches the Authorization header and retries after refresh
+      const url = `/jobs?skip=${skip}&limit=${limit}`;
+      const res = await fetchWithAuth(url, { signal: controller.signal, method: "GET" });
+
+      // If fetchWithAuth threw (e.g., refresh failed) it will have already cleared tokens.
       if (!res.ok) {
+        // Try to parse error body for friendly message
         const body = await res.json().catch(() => ({}));
+        // If unauthorized, navigate to auth page
+        if (res.status === 401) {
+          clearTokens();
+          navigate("/auth", { replace: true });
+          return;
+        }
         throw new Error(body.detail || `Server responded ${res.status}`);
       }
+
       const data = await res.json();
 
       if (
@@ -71,6 +88,12 @@ export default function Jobs({ setCurrentJob }) {
       setJobs(Array.isArray(data) ? data : []);
     } catch (err) {
       if (err.name !== "AbortError") {
+        // If the fetchWithAuth refresh failed it may have already cleared tokens; redirect user to auth
+        if (err.message && err.message.toLowerCase().includes("refresh failed")) {
+          clearTokens();
+          navigate("/auth", { replace: true });
+          return;
+        }
         setError(err.message || "Failed to fetch jobs");
         setJobs([]);
       }

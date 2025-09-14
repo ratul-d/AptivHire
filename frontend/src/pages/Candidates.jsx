@@ -1,8 +1,7 @@
 // src/pages/Candidates.jsx
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+import { fetchWithAuth, getAccessToken, clearTokens } from "../services/auth";
 
 export default function Candidates({ setCurrentCandidate }) {
   const [candidates, setCandidates] = useState([]);
@@ -18,6 +17,13 @@ export default function Candidates({ setCurrentCandidate }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Redirect to auth if no token present
+    if (!getAccessToken()) {
+      clearTokens();
+      navigate("/auth", { replace: true });
+      return;
+    }
+
     fetchCandidates();
     return () => {
       if (abortRef.current) abortRef.current.abort();
@@ -48,13 +54,18 @@ export default function Candidates({ setCurrentCandidate }) {
         skip = (page - 1) * limit;
       }
 
-      const res = await fetch(
-        `${API_BASE}/candidates?skip=${skip}&limit=${limit}`,
-        { signal: controller.signal }
-      );
+      // Use fetchWithAuth which attaches the Authorization header and retries after refresh
+      const url = `/candidates?skip=${skip}&limit=${limit}`;
+      const res = await fetchWithAuth(url, { signal: controller.signal, method: "GET" });
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          // token expired or invalid — clear and redirect to auth
+          clearTokens();
+          navigate("/auth", { replace: true });
+          return;
+        }
         throw new Error(body.detail || `Server responded ${res.status}`);
       }
 
@@ -73,6 +84,12 @@ export default function Candidates({ setCurrentCandidate }) {
       setCandidates(Array.isArray(data) ? data : []);
     } catch (err) {
       if (err.name !== "AbortError") {
+        // If refresh failed inside fetchWithAuth, fetchWithAuth should have cleared tokens.
+        if (err.message && err.message.toLowerCase().includes("refresh failed")) {
+          clearTokens();
+          navigate("/auth", { replace: true });
+          return;
+        }
         setError(err.message || "Failed to fetch candidates");
         setCandidates([]);
       }

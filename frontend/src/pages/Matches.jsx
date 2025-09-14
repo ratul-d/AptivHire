@@ -1,8 +1,7 @@
 // src/pages/Matches.jsx
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+import { fetchWithAuth, getAccessToken } from "../services/auth";
 
 export default function Matches() {
   const [matches, setMatches] = useState([]);
@@ -23,12 +22,23 @@ export default function Matches() {
   const abortRef = useRef(null);
   const navigate = useNavigate();
 
+  // Redirect to auth if there's no access token immediately (protect page)
+  useEffect(() => {
+    const token = getAccessToken();
+    if (!token) {
+      navigate("/auth", { replace: true });
+    }
+    // run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     fetchMatches();
     return () => {
       if (abortRef.current) abortRef.current.abort();
     };
     // intentionally only depend on page and pageSize
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, pageSize]);
 
   // re-apply search whenever matches or either search input changes
@@ -55,12 +65,21 @@ export default function Matches() {
         skip = (page - 1) * limit;
       }
 
-      const res = await fetch(`${API_BASE}/matches?skip=${skip}&limit=${limit}`, {
+      // use fetchWithAuth so Authorization header + refresh logic is applied
+      const path = `/matches?skip=${skip}&limit=${limit}`;
+      const res = await fetchWithAuth(path, {
+        method: "GET",
         signal: controller.signal,
       });
 
       if (!res.ok) {
+        // try parse body for a useful message
         const body = await res.json().catch(() => ({}));
+        // if 401, treat as auth failure and redirect to /auth
+        if (res.status === 401) {
+          // clear tokens handled by fetchWithAuth/refresh but make sure to redirect
+          navigate("/auth", { replace: true });
+        }
         throw new Error(body.detail || `Server responded ${res.status}`);
       }
 
@@ -74,8 +93,23 @@ export default function Matches() {
 
       setMatches(Array.isArray(data) ? data : []);
     } catch (err) {
+      // if fetchWithAuth failed due to refresh/no refresh token, redirect to login
+      const msg = err?.message || String(err);
+      const lower = msg.toLowerCase();
+      if (
+        lower.includes("refresh") ||
+        lower.includes("no refresh token") ||
+        lower.includes("401") ||
+        lower.includes("unauthorized")
+      ) {
+        // navigate user to auth page to re-login
+        navigate("/auth", { replace: true });
+        return;
+      }
+
+      // ignore aborts
       if (err.name !== "AbortError") {
-        setError(err.message || "Failed to fetch matches");
+        setError(msg || "Failed to fetch matches");
         setMatches([]);
       }
     } finally {
@@ -263,11 +297,7 @@ export default function Matches() {
 
           <label style={{ fontSize: 13, color: "#444" }}>
             Page size{" "}
-            <select
-              value={pageSize}
-              onChange={handlePageSizeChange}
-              style={{ marginLeft: 6 }}
-            >
+            <select value={pageSize} onChange={handlePageSizeChange} style={{ marginLeft: 6 }}>
               <option value={25}>25</option>
               <option value={50}>50</option>
               <option value={100}>100</option>
@@ -322,9 +352,7 @@ export default function Matches() {
                 }}
               >
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700, marginBottom: 6 }}>
-                    Score: {score}
-                  </div>
+                  <div style={{ fontWeight: 700, marginBottom: 6 }}>Score: {score}</div>
 
                   <div style={{ fontSize: 13, marginBottom: 6 }}>
                     <strong>Job Title:</strong> {m.job_title ?? "—"}

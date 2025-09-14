@@ -1,6 +1,6 @@
 // src/components/CandidatePanel.jsx
 import React, { useState, useRef, useEffect } from "react";
-import { uploadCandidatePDF } from "../services/api";
+import { getAccessToken, refreshAccessToken, clearTokens } from "../services/auth";
 
 /**
  * CandidatePanel
@@ -53,14 +53,57 @@ export default function CandidatePanel({
     e.stopPropagation();
   }
 
+  // Use the same API base as the app (matches pattern in services)
+  const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+
   async function processCandidatePDF() {
     if (!selectedFile) {
       setFileError("Please select a PDF file");
       return;
     }
     setLoading(true);
+    setFileError("");
     try {
-      const candidate = await uploadCandidatePDF(selectedFile);
+      const fd = new FormData();
+      fd.append("file", selectedFile);
+
+      // helper to perform the fetch with the current access token
+      async function doUploadWithToken(token) {
+        const headers = {};
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+        // DON'T set Content-Type so the browser will add multipart boundary
+        const res = await fetch(`${API_BASE}/candidates`, {
+          method: "POST",
+          headers,
+          body: fd,
+        });
+        return res;
+      }
+
+      let access = getAccessToken();
+      let res = await doUploadWithToken(access);
+
+      // if unauthorized, try refresh once (same logic as client-side refresh)
+      if (res.status === 401) {
+        try {
+          await refreshAccessToken();
+          access = getAccessToken();
+          res = await doUploadWithToken(access);
+        } catch (refreshErr) {
+          // failed to refresh -> clear tokens and inform user
+          clearTokens();
+          throw new Error("Authentication failed — please login again");
+        }
+      }
+
+      if (!res.ok) {
+        // attempt to parse useful error message
+        const body = await res.json().catch(() => ({}));
+        const message = body.detail || body.message || JSON.stringify(body) || `HTTP ${res.status}`;
+        throw new Error(message);
+      }
+
+      const candidate = await res.json();
       setLocalCandidate(candidate);
       setCurrentCandidate(candidate); // lift to parent
       // clear temp upload
@@ -68,8 +111,7 @@ export default function CandidatePanel({
       setFileName("");
       setFileError("");
     } catch (err) {
-      // handle both Error object or string
-      const message = (err && (err.detail || err.message)) || String(err);
+      const message = (err && (err.message || err.detail)) || String(err);
       setFileError("Upload failed: " + message);
     } finally {
       setLoading(false);
