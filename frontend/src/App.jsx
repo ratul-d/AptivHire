@@ -33,8 +33,8 @@ export default function App() {
           }
         >
           {/* nested inside Layout (Layout should render an <Outlet />) */}
-          <Route index element={<Home />} />
-          <Route path="dashboard" element={<Dashboard />} />
+
+          <Route index element={<Dashboard />} />
           <Route path="jobs" element={<Jobs />} />
           <Route path="candidates" element={<Candidates />} />
           <Route path="matches" element={<Matches />} />

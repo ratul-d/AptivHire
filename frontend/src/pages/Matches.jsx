@@ -66,7 +66,7 @@ export default function Matches() {
       }
 
       // use fetchWithAuth so Authorization header + refresh logic is applied
-      const path = `/matches?skip=${skip}&limit=${limit}`;
+      const path = `/matches/read?skip=${skip}&limit=${limit}`;
       const res = await fetchWithAuth(path, {
         method: "GET",
         signal: controller.signal,
@@ -381,7 +381,7 @@ export default function Matches() {
                 </div>
 
                 <div style={{ marginLeft: 12, display: "flex", flexDirection: "column", gap: 8 }}>
-                  <div style={{ fontSize: 12, color: "#666" }}>Match ID: {m.id ?? "—"}</div>
+
                   <button
                     onClick={(e) => {
                       e.stopPropagation();

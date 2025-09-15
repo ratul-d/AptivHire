@@ -1,10 +1,11 @@
 // src/components/Header.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { clearTokens } from "../services/auth";
+import { clearTokens, getEmail } from "../services/auth";
 
 export default function Header({ toggleSidebar }) {
   const navigate = useNavigate();
+  const email = getEmail();
 
   function handleLogout() {
     // optional confirmation
@@ -54,6 +55,8 @@ export default function Header({ toggleSidebar }) {
 
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <div style={{ color: "#666" }}>Recruitment Streamlining Portal</div>
+        <div style={{ color: "#666" }}>|</div>
+        <div style={{ color: "#666" }}>User: {email}</div>
 
         <button
           onClick={handleLogout}

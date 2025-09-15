@@ -9,7 +9,7 @@ from app.models import User
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
-@router.post("/",response_model=job_schema.Job)
+@router.post("/create",response_model=job_schema.Job)
 async def create_job(jd_input: job_schema.JDInput, db: Session=Depends(get_db),current_user: User = Depends(get_current_user)):
     try:
         result = await jd_agent.run(jd_input.raw_text)
@@ -24,7 +24,7 @@ async def create_job(jd_input: job_schema.JDInput, db: Session=Depends(get_db),c
     except Exception as e:
         raise HTTPException(status_code=500,detail=str(e))
 
-@router.get("/",response_model=list[job_schema.Job])
+@router.get("/read",response_model=list[job_schema.Job])
 def read_jobs(skip: int=0,limit: int=100, db: Session=Depends(get_db),current_user: User = Depends(get_current_user)):
     return crud.get_jobs(db=db,user_id=current_user["id"],skip=skip,limit=limit)
 

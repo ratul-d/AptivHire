@@ -59,7 +59,7 @@ export default function Interviews() {
       }
 
       const res = await fetchWithAuth(
-        `${API_BASE}/interviews?skip=${skip}&limit=${limit}`,
+        `${API_BASE}/interviews/read?skip=${skip}&limit=${limit}`,
         { signal: controller.signal }
       );
 
@@ -344,7 +344,7 @@ export default function Interviews() {
                     alignItems: "flex-end",
                   }}
                 >
-                  <div style={{ fontSize: 12, color: "#666" }}>Interview ID: {it.id ?? "—"}</div>
+
                   <button
                     onClick={(e) => {
                       e.stopPropagation();

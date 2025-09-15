@@ -497,9 +497,7 @@ export default function InterviewDetails() {
           {jobError && <div style={{ color: "red", marginBottom: 8 }}>Error: {jobError}</div>}
           {job ? (
             <div style={{ fontSize: 13 }}>
-              <div>
-                <strong>ID:</strong> {job.id ?? "—"}
-              </div>
+
               <div style={{ marginTop: 6 }}>
                 <strong>Title:</strong> {job.title ?? "—"}
               </div>
@@ -529,9 +527,7 @@ export default function InterviewDetails() {
           )}
           {candidate ? (
             <div style={{ fontSize: 13 }}>
-              <div>
-                <strong>ID:</strong> {candidate.id ?? "—"}
-              </div>
+
               <div style={{ marginTop: 6 }}>
                 <strong>Name:</strong> {candidate.name ?? candidate.full_name ?? "—"}
               </div>

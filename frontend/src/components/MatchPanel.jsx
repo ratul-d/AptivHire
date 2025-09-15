@@ -35,7 +35,7 @@ export default function MatchPanel({ currentJob, currentCandidate }) {
 
     setLoading(true);
     try {
-      const res = await fetchWithAuth("/matches", {
+      const res = await fetchWithAuth("/matches/create", {
         method: "POST",
         body: JSON.stringify({ job_id: currentJob.id, candidate_id: currentCandidate.id }),
       });
@@ -77,10 +77,10 @@ export default function MatchPanel({ currentJob, currentCandidate }) {
     <div className="panel">
       <div className="panel-title">Match Result</div>
 
+      <div id="match-input-container" style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+        <p>Job ID: <span className="id-badge">{currentJob ? "Set" : "Not set"}</span></p>
+        <p>Candidate ID: <span className="id-badge">{currentCandidate ? "Set" : "Not set"}</span></p></div>
       <div id="match-input-container">
-        <p>Job ID: <span className="id-badge">{currentJob ? currentJob.id : "Not set"}</span></p>
-        <p>Candidate ID: <span className="id-badge">{currentCandidate ? currentCandidate.id : "Not set"}</span></p>
-
         {/* If user is not authenticated show CTA to login */}
         {!isAuth ? (
           <div id="match-button-container">

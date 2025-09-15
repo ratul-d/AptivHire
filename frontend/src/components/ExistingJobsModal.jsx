@@ -36,7 +36,7 @@ export default function ExistingJobsModal({ show, onClose, setCurrentJob }) {
       }
 
       // fetch first page of jobs (adjust skip/limit if you want pagination inside modal)
-      const res = await fetchWithAuth(`/jobs?skip=0&limit=100`, {
+      const res = await fetchWithAuth(`/jobs/read?skip=0&limit=100`, {
         method: "GET",
         signal: controller.signal,
       });
@@ -122,7 +122,7 @@ export default function ExistingJobsModal({ show, onClose, setCurrentJob }) {
                   {job.title || "Untitled Job"}
                 </div>
                 <div className="list-item-details">
-                  ID: {job.id} | Skills: {job.skills || "Not specified"}
+                  Skills: {job.skills || "Not specified"}
                 </div>
               </div>
             ))}

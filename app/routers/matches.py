@@ -9,7 +9,7 @@ from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/matches",tags=["Matches"])
 
-@router.post("/",response_model=match_schema.Match)
+@router.post("/create",response_model=match_schema.Match)
 async def create_match(match: match_schema.MatchPOSTEndpoint,db: Session=Depends(get_db),current_user: User = Depends(get_current_user)):
     job = crud.get_job_by_id(db=db,job_id=match.job_id,user_id=current_user["id"])
     if not job:
@@ -60,7 +60,7 @@ async def create_match(match: match_schema.MatchPOSTEndpoint,db: Session=Depends
     except Exception as e:
         raise HTTPException(status_code=500,detail=str(e))
 
-@router.get("/",response_model=list[match_schema.Match])
+@router.get("/read",response_model=list[match_schema.Match])
 def read_matches(skip: int=0,limit: int=100,db: Session=Depends(get_db),current_user: User = Depends(get_current_user)):
     return crud.get_matches(db=db,skip=skip,limit=limit,user_id=current_user["id"])
 

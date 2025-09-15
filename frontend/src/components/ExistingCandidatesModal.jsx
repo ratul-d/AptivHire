@@ -19,7 +19,7 @@ export default function ExistingCandidatesModal({ show, onClose, setCurrentCandi
       setLoading(true);
       try {
         // fetchWithAuth returns a Response (and will attempt refresh automatically)
-        const res = await fetchWithAuth("/candidates", {
+        const res = await fetchWithAuth("/candidates/read", {
           signal: controller.signal,
         });
 
@@ -144,7 +144,7 @@ export default function ExistingCandidatesModal({ show, onClose, setCurrentCandi
                   {c.name || "Unnamed Candidate"}
                 </div>
                 <div className="list-item-details" style={{ fontSize: 12, color: "#666" }}>
-                  ID: {c.id} | Email: {c.email || "Not specified"}
+                  Email: {c.email || "Not specified"} | Phone: {c.phone || "Not specified"}
                 </div>
               </div>
             ))}

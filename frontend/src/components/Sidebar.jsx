@@ -61,28 +61,10 @@ export default function Sidebar({ isOpen, onNavigate }) {
             gap: 12, // spacing between buttons
           }}
         >
-        <li>
-            <Link
-              to="/"
-              onClick={() => onNavigate?.()}
-              style={{
-                display: "block",
-                padding: "10px 14px",
-                borderRadius: 6,
-                textDecoration: "none",
-                color: "#111",
-                background: "#f5f5f5",
-                transition: "background 0.2s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#e2e2e2")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "#f5f5f5")}
-            >
-              Home
-            </Link>
-          </li>
+
           <li>
             <Link
-              to="/dashboard"
+              to="/"
               onClick={() => onNavigate?.()}
               style={{
                 display: "block",

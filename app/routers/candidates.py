@@ -12,7 +12,7 @@ from app.models import User
 
 router = APIRouter(prefix="/candidates",tags=["Candidates"])
 
-@router.post("/",response_model=candidate_schema.Candidate)
+@router.post("/create",response_model=candidate_schema.Candidate)
 async def create_candidate(file: UploadFile = File(...),db: Session=Depends(get_db),current_user: User = Depends(get_current_user)):
     temp_path=f"temp_{file.filename}"
     try:
@@ -38,7 +38,7 @@ async def create_candidate(file: UploadFile = File(...),db: Session=Depends(get_
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
-@router.get("/",response_model=list[candidate_schema.Candidate])
+@router.get("/read",response_model=list[candidate_schema.Candidate])
 def read_candidates(skip: int=0, limit: int=100, db: Session=Depends(get_db),current_user: User = Depends(get_current_user)):
     return crud.get_candidates(db=db,user_id=current_user["id"],skip=skip,limit=limit)
 

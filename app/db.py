@@ -1,4 +1,5 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 from dotenv import load_dotenv
@@ -10,6 +11,14 @@ DATABASE_URL = os.getenv(
 )
 
 engine = create_engine(DATABASE_URL,echo=True)
+
+if os.getenv("DB_ENV") == "neon":
+    @event.listens_for(Engine, "connect")
+    def set_search_path(dbapi_connection, connection_record):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("SET search_path TO public")
+        cursor.close()
+
 
 SessionLocal = sessionmaker(autocommit=False,autoflush=False,bind=engine)
 

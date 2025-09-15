@@ -38,7 +38,7 @@ export default function InterviewPanel({ currentJob, currentCandidate }) {
       };
 
       // Use fetchWithAuth so the request includes the access token and attempts refresh if needed
-      const res = await fetchWithAuth("/interviews", {
+      const res = await fetchWithAuth("/interviews/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -83,16 +83,17 @@ export default function InterviewPanel({ currentJob, currentCandidate }) {
     <div className="panel">
       <div className="panel-title">Schedule Interview</div>
 
-      <div id="interview-form">
+      <div id="interview-form"style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
         <div className="form-group">
           <label>Job ID</label>
-          <input type="text" value={currentJob ? currentJob.id : ""} readOnly />
+          <input type="text" value={currentJob ? "Set" : ""} readOnly />
         </div>
         <div className="form-group">
           <label>Candidate ID</label>
-          <input type="text" value={currentCandidate ? currentCandidate.id : ""} readOnly />
+          <input type="text" value={currentCandidate ? "Set" : ""} readOnly />
         </div>
-
+        </div>
+        <div id="interview-form">
         <div className="flex-row">
           <div className="form-group">
             <label>Date & Time (IST)</label>

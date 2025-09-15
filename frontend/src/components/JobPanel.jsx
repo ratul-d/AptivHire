@@ -30,7 +30,7 @@ export default function JobPanel({ currentJob, setCurrentJob, openJobsModal }) {
     try {
       const processedText = text.replace(/\s+/g, " ").trim();
 
-      const res = await fetchWithAuth("/jobs", {
+      const res = await fetchWithAuth("/jobs/create", {
         method: "POST",
         body: JSON.stringify({ raw_text: processedText }),
       });
@@ -94,7 +94,6 @@ export default function JobPanel({ currentJob, setCurrentJob, openJobsModal }) {
         </div>
       ) : (
         <div id="job-result-container" className="result-container" style={{ display: "block" }}>
-          <div className="result-item"><strong>ID:</strong> <span>{currentJob.id}</span></div>
           <div className="result-item"><strong>Title:</strong> <span>{currentJob.title}</span></div>
           <div className="result-item"><strong>Summary:</strong> <span>{currentJob.summary}</span></div>
           <div className="result-item"><strong>Skills:</strong> <span>{currentJob.skills}</span></div>

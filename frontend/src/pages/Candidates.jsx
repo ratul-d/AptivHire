@@ -55,7 +55,7 @@ export default function Candidates({ setCurrentCandidate }) {
       }
 
       // Use fetchWithAuth which attaches the Authorization header and retries after refresh
-      const url = `/candidates?skip=${skip}&limit=${limit}`;
+      const url = `/candidates/read?skip=${skip}&limit=${limit}`;
       const res = await fetchWithAuth(url, { signal: controller.signal, method: "GET" });
 
       if (!res.ok) {
@@ -133,7 +133,7 @@ export default function Candidates({ setCurrentCandidate }) {
     if (typeof setCurrentCandidate === "function") {
       setCurrentCandidate(candidate);
     }
-    navigate("/dashboard", { state: { candidate } });
+    navigate("/", { state: { candidate } });
   }
 
   return (
@@ -266,9 +266,7 @@ export default function Candidates({ setCurrentCandidate }) {
                     gap: 8,
                   }}
                 >
-                  <div style={{ fontSize: 12, color: "#666" }}>
-                    ID: {c.id ?? "—"}
-                  </div>
+
                   <button
                     onClick={() => selectCandidate(c)}
                     style={{ padding: "8px 12px", cursor: "pointer" }}

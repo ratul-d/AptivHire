@@ -12,12 +12,14 @@ SMTP_USER = os.getenv("SMTP_USER")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 
 
-async def send_email(subject: str,body: str, recipient_email: str) -> bool:
+async def send_email(subject: str,body: str, recipient_email: str, reply_to: str = None) -> bool:
     try:
         msg = MIMEMultipart()
         msg["From"] = SMTP_USER
         msg["To"] = recipient_email
         msg["Subject"] = subject
+        if reply_to:
+            msg["Reply-To"] = reply_to
 
         msg.attach(MIMEText(body, "plain"))
 

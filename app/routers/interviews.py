@@ -11,7 +11,7 @@ from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/interviews",tags=["Interviews"])
 
-@router.post("/",response_model=interview_schema.Interview)
+@router.post("/create",response_model=interview_schema.Interview)
 async def create_interview(interview: interview_schema.InterviewPOSTEndpoint, db: Session=Depends(get_db),current_user: User = Depends(get_current_user)):
     job = crud.get_job_by_id(db=db, job_id=interview.job_id,user_id=current_user["id"])
     if not job:
@@ -62,7 +62,8 @@ async def create_interview(interview: interview_schema.InterviewPOSTEndpoint, db
     sent = await send_email(
         subject=email_data["subject"],
         body=email_data["body"],
-        recipient_email=email_data["recipient_email"]
+        recipient_email=email_data["recipient_email"],
+        reply_to=current_user["email"]
     )
     if not sent:
         raise HTTPException(status_code=500,detail="Failed to send interview email")
@@ -83,7 +84,7 @@ async def create_interview(interview: interview_schema.InterviewPOSTEndpoint, db
     except Exception as e:
         raise HTTPException(status_code=500,detail=f"Error at interview db insertion:{e}")
 
-@router.get("/",response_model=list[interview_schema.Interview])
+@router.get("/read",response_model=list[interview_schema.Interview])
 def read_interviews(skip: int=0,limit: int=100,db: Session=Depends(get_db),current_user: User = Depends(get_current_user)):
     return crud.get_interviews(db=db,skip=skip,limit=limit,user_id=current_user["id"])
 

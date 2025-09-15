@@ -72,7 +72,7 @@ export default function CandidatePanel({
         const headers = {};
         if (token) headers["Authorization"] = `Bearer ${token}`;
         // DON'T set Content-Type so the browser will add multipart boundary
-        const res = await fetch(`${API_BASE}/candidates`, {
+        const res = await fetch(`${API_BASE}/candidates/create`, {
           method: "POST",
           headers,
           body: fd,
@@ -208,7 +208,6 @@ export default function CandidatePanel({
         </div>
       ) : (
         <div id="candidate-result-container" className="result-container" style={{ display: "block" }}>
-          <div className="result-item"><strong>ID:</strong> <span id="candidate-id">{localCandidate.id}</span></div>
           <div className="result-item"><strong>Name:</strong> <span id="candidate-name">{localCandidate.name}</span></div>
           <div className="result-item"><strong>Email:</strong> <span id="candidate-email">{localCandidate.email}</span></div>
           <div className="result-item"><strong>Phone:</strong> <span id="candidate-phone">{localCandidate.phone}</span></div>

@@ -57,7 +57,7 @@ export default function Jobs({ setCurrentJob }) {
       }
 
       // Use fetchWithAuth which attaches the Authorization header and retries after refresh
-      const url = `/jobs?skip=${skip}&limit=${limit}`;
+      const url = `/jobs/read?skip=${skip}&limit=${limit}`;
       const res = await fetchWithAuth(url, { signal: controller.signal, method: "GET" });
 
       // If fetchWithAuth threw (e.g., refresh failed) it will have already cleared tokens.
@@ -137,7 +137,7 @@ export default function Jobs({ setCurrentJob }) {
     if (typeof setCurrentJob === "function") {
       setCurrentJob(job);
     }
-    navigate("/dashboard", { state: { job } });
+    navigate("/", { state: { job } });
   }
 
   return (
@@ -235,7 +235,7 @@ export default function Jobs({ setCurrentJob }) {
                   gap: 8,
                 }}
               >
-                <div style={{ fontSize: 12, color: "#666" }}>ID: {job.id}</div>
+
                 <button
                   onClick={() => selectJob(job)}
                   style={{ padding: "8px 12px", cursor: "pointer" }}

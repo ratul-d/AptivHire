@@ -3,12 +3,16 @@ const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 
 const ACCESS_KEY = "aptiv_access_token";
 const REFRESH_KEY = "aptiv_refresh_token";
+const EMAIL = "aptiv_email";
 
 export function getAccessToken() {
   return localStorage.getItem(ACCESS_KEY);
 }
 export function getRefreshToken() {
   return localStorage.getItem(REFRESH_KEY);
+}
+export function getEmail() {
+  return localStorage.getItem(EMAIL);
 }
 export function setTokens({ access_token, refresh_token }) {
   if (access_token) localStorage.setItem(ACCESS_KEY, access_token);
@@ -17,6 +21,7 @@ export function setTokens({ access_token, refresh_token }) {
 export function clearTokens() {
   localStorage.removeItem(ACCESS_KEY);
   localStorage.removeItem(REFRESH_KEY);
+  localStorage.removeItem(EMAIL);
 }
 
 /** login: POST /auth/login -> expects { email, password }.
@@ -34,6 +39,7 @@ export async function login({ email, password }) {
   }
   const data = await res.json();
   setTokens(data);
+  if (email) localStorage.setItem(EMAIL, email);
   return data;
 }
 
