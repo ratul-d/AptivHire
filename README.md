@@ -27,7 +27,7 @@ AptivHire helps recruiters automate candidate screening and interview scheduling
 ## Architecture & Components
 
 * **Backend**: FastAPI, SQLAlchemy, PostgreSQL, Alembic for database migrations.
-* **Agents / AI Layer**: Modules integrating LLM functionality provided by Groq to extract, compose, and process content.
+* **Agents / AI Layer**: LLM logic runs through Groq for inference. Agents are implemented as Pydantic-validated modules (Pydantic models + typed interfaces) that handle JD/CV parsing, matching, and email generation.
 * **Email**: Asynchronous email handling using `aiosmtplib` for sending notifications and alerts.
 * **Frontend**: Vite + React, with client-side token management and a `fetchWithAuth` utility for secure API requests.
 * **Authentication**: JWT-based access and refresh token flow for secure user sessions.
@@ -180,28 +180,28 @@ npm run dev
 
 > Jobs:
 
-* `POST /jobs` — Create job (protected). Body: either raw JD input or structured JD JSON depending on client. Example (raw):
+* `POST /jobs/create` — Create job (protected). Body: either raw JD input or structured JD JSON depending on client. Example (raw):
 
   ```json
   { "raw_text": "Full job description here..." }
   ```
 
-* `GET /jobs?skip=0&limit=100` — List jobs (protected). Returns an array of `Job` objects.
+* `GET /jobs/read` — List jobs (protected). Returns an array of `Job` objects.
 
 * `GET /jobs/{job_id}` — Get job by ID (protected). Returns single `Job`.
 
 > Candidates:
 
-* `POST /candidates` — Upload a candidate PDF (protected). Use `multipart/form-data` with field name `file`. Returns structured candidate data extracted from the PDF.
+* `POST /candidates/create` — Upload a candidate PDF (protected). Use `multipart/form-data` with field name `file`. Returns structured candidate data extracted from the PDF.
   
 
-* `GET /candidates` — List candidates (protected). Returns an array of `Candidate` objects.
+* `GET /candidates/read` — List candidates (protected). Returns an array of `Candidate` objects.
 
 * `GET /candidates/{candidate_id}` — Get candidate by ID (protected). Returns single `Candidate`.
 
 > Matches:
 
-* `POST /matches` — Compute and store a match (protected). Body should include `job_id` and `candidate_id` (JSON). Example:
+* `POST /matches/create` — Compute and store a match (protected). Body should include `job_id` and `candidate_id` (JSON). Example:
 
   ```json
   { "job_id": 1, "candidate_id": 2 }
@@ -209,13 +209,13 @@ npm run dev
 
   Returns created `Match` object. Duplicate matches are returned if they already exist.
 
-* `GET /matches` — List matches (protected). Returns an array of `Match` objects.
+* `GET /matches/read` — List matches (protected). Returns an array of `Match` objects.
 
 * `GET /matches/{job_id}/{candidate_id}` — Get a specific match (protected). Returns single `Match`.
 
 > Interviews:
 
-* `POST /interviews` — Schedule interview (protected). Expected JSON fields:
+* `POST /interviews/create` — Schedule interview (protected). Expected JSON fields:
 
   ```json
   {
@@ -228,7 +228,7 @@ npm run dev
 
   *Behavior:* prevents duplicate interview records for the same job & candidate. Generates email content (via agent) and attempts to send an invite. Returns created `Interview` on success.
 
-* `GET /interviews` — List interviews (protected). Returns an array of `Interview` objects.
+* `GET /interviews/read` — List interviews (protected). Returns an array of `Interview` objects.
 
 * `GET /interviews/{job_id}/{candidate_id}` — Get interview for a specific job & candidate (protected). Returns single `Interview`.
 
