@@ -96,7 +96,7 @@ VITE_API_BASE=http://localhost:8000
 >   from app.utils.email_sender import send_email
 >   ```
 >   instead of `gmail_helper`.
-> * If using Gmail API: refer to the [Gmail API guide](https://github.com/ratul-d/AptivHire/blob/master/app/utils/gmail%20api.txt).
+> * If using Gmail API: refer to the [Gmail API guide](https://github.com/ratul-d/AptivHire/blob/master/app/utils/gmail%20api.md).
 
 ---
 
@@ -300,7 +300,7 @@ curl -X POST http://localhost:8000/jobs \
 * Configure connection pooling for SQLAlchemy (set `pool_size`, etc.) for production DB.
 * Use an external SMTP or email provider for sending messages at scale.
   * Additionally, a `gmail_helper.py` has been added that uses the Gmail API for sending emails.  
-    Setup instructions are provided in the [Gmail API guide](https://github.com/ratul-d/AptivHire/blob/master/app/utils/gmail%20api.txt).
+    Setup instructions are provided in the [Gmail API guide](https://github.com/ratul-d/AptivHire/blob/master/app/utils/gmail%20api.md).
 * Use managed DB (RDS, Cloud SQL) with backups and replicas as needed.
 * Store secrets in a secret manager (Vault, AWS Secrets Manager, Azure Key Vault).
 

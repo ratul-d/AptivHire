@@ -32,8 +32,9 @@ with open("token.pkl", "wb") as token_file:
     pickle.dump(creds, token_file)
 
 print("OAuth token saved to token.pkl")
+```
 
-6. Delete script.py and add token.pkl to gitignore.
+6. Delete `script.py` and add `token.pkl` to gitignore.
 
 7. Use the token like this:
 ```python
@@ -46,3 +47,4 @@ with open("token.pkl", "rb") as f:
 
 # Initialize Gmail API
 service = build("gmail", "v1", credentials=creds)
+```
