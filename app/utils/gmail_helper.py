@@ -10,18 +10,18 @@ import os
 def load_gmail_creds():
     # Try local first
     local_path = "token.pkl"
-    render_path = "/etc/secrets/token.pkl"
+    render_path = "/etc/secrets/token_b64.txt"
 
-    token_path = None
     if os.path.exists(local_path):
-        token_path = local_path
+        with open(local_path, "rb") as f:
+            creds: Credentials = pickle.load(f)
     elif os.path.exists(render_path):
-        token_path = render_path
+        with open(render_path, "r") as f:
+            b64_data = f.read().strip()
+        data = base64.b64decode(b64_data)
+        creds: Credentials = pickle.loads(data)
     else:
-        raise FileNotFoundError("No token.pkl found locally or in /etc/secrets/")
-
-    with open(token_path, "rb") as f:
-        creds: Credentials = pickle.load(f)
+        raise FileNotFoundError("No token credentials found!")
 
     return creds
 
