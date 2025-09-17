@@ -8,8 +8,8 @@ RUN npm install
 COPY frontend/ ./
 
 # allow build-time env vars like VITE_API_URL
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
+ARG VITE_API_BASE
+ENV VITE_API_BASE=$VITE_API_BASE
 
 RUN npm run build
 
