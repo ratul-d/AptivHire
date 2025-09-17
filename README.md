@@ -16,7 +16,7 @@ AptivHire helps recruiters automate candidate screening and interview scheduling
 * Paste job description (free text → structured job fields)
 * LLM-based matching agent produces match score, reasoning, and missing items
 * Create and store matches and interviews in the database
-* Email generation + sending (SMTP) for interview invitations
+* Email generation + sending (SMTP/Gmail API) for interview invitations
 * Authentication (JWT access + refresh token) and protected API endpoints
 * React frontend with pages for Dashboard, Jobs, Candidates, Matches, Interviews
 * Pagination and search on listing pages
@@ -78,6 +78,7 @@ DATABASE_URL=postgresql+psycopg2://user:password@localhost:5432/yourdb
 GROQ_API_KEY=YOUR_API_KEY
 SECRET_KEY=YOUR_SECRET_KEY_HERE
 
+# If using SMTP
 SMTP_USER=your-email@gmail.com
 SMTP_PASSWORD=your-smtp-password-or-app-password
 ```
@@ -90,7 +91,12 @@ VITE_API_BASE=http://localhost:8000
 
 > Notes:
 >
-> * If using Gmail: enable 2FA and create an *App Password* (preferred) or use a transactional email service (recommended for production).
+> * If using Gmail SMTP: enable 2FA, create an *App Password*, and update imports in interview routes to use:
+>   ```python
+>   from app.utils.email_sender import send_email
+>   ```
+>   instead of `gmail_helper`.
+> * If using Gmail API: refer to the [Gmail API guide](https://github.com/ratul-d/AptivHire/blob/master/app/utils/gmail%20api.txt).
 
 ---
 
