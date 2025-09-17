@@ -137,7 +137,7 @@ export default function Jobs({ setCurrentJob }) {
     if (typeof setCurrentJob === "function") {
       setCurrentJob(job);
     }
-    navigate("/", { state: { job } });
+    navigate("/dashboard", { state: { job } });
   }
 
   return (

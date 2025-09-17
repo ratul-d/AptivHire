@@ -14,12 +14,14 @@ import Matches from "./pages/Matches";
 import Interviews from "./pages/Interviews";
 import MatchDetails from "./pages/MatchDetails";
 import InterviewDetails from "./pages/InterviewDetails";
+import AptivHire from "./pages/landing"
 
 export default function App() {
   return (
     <Router>
       <Routes>
         {/* Public auth route */}
+        <Route index element={<AptivHire />} />
         <Route path="/auth" element={<AuthPage />} />
 
         {/* All routes nested under "/" are protected */}
@@ -34,7 +36,8 @@ export default function App() {
         >
           {/* nested inside Layout (Layout should render an <Outlet />) */}
 
-          <Route index element={<Dashboard />} />
+
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="jobs" element={<Jobs />} />
           <Route path="candidates" element={<Candidates />} />
           <Route path="matches" element={<Matches />} />

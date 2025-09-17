@@ -42,7 +42,7 @@ export default function Sidebar({ isOpen, onNavigate }) {
           position: "absolute",
           top: 20,
           right: 130, // leave space for ✖ button
-          fontWeight: "bold",
+          fontWeight: 750,
           fontSize: 25,
           color: "#222",
         }}
@@ -64,7 +64,7 @@ export default function Sidebar({ isOpen, onNavigate }) {
 
           <li>
             <Link
-              to="/"
+              to="/dashboard"
               onClick={() => onNavigate?.()}
               style={{
                 display: "block",

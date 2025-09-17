@@ -133,7 +133,7 @@ export default function Candidates({ setCurrentCandidate }) {
     if (typeof setCurrentCandidate === "function") {
       setCurrentCandidate(candidate);
     }
-    navigate("/", { state: { candidate } });
+    navigate("/dashboard", { state: { candidate } });
   }
 
   return (

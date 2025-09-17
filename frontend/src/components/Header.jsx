@@ -43,14 +43,14 @@ export default function Header({ toggleSidebar }) {
             color: "#fff",
             border: "none",
             cursor: "pointer",
-            padding: 7,
+            padding: 5,
             borderRadius: 6,
           }}
         >
           ☰
         </button>
 
-        <div style={{ fontWeight: 700, fontSize: 25 }}>AptivHire</div>
+        <div style={{ fontWeight: 800, fontSize: 25 }}>AptivHire</div>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>

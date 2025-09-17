@@ -51,7 +51,7 @@ export default function AuthPage() {
     try {
       await login({ email: trimmedEmail, password });
       setMessage("Login successful — redirecting...");
-      setTimeout(() => navigate("/"), 600);
+      setTimeout(() => navigate("/dashboard"), 600);
     } catch (err) {
       setError(err.message || "Login failed");
     } finally {
@@ -81,7 +81,7 @@ export default function AuthPage() {
     <div style={{ padding: 24, display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
       <div style={{ width: 480, background: "#fff", borderRadius: 10, padding: 28, boxShadow: "0 8px 30px rgba(0,0,0,0.06)" }}>
         <header style={{ textAlign: "center", marginBottom: 18 }}>
-          <div style={{ fontSize: 28, fontWeight: 700 }}>AptivHire</div>
+          <div style={{ fontSize: 28, fontWeight: 750 }} onClick={() => navigate('/')}>AptivHire</div>
         </header>
 
         <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
