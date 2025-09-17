@@ -4,7 +4,7 @@ from app import crud
 from app.schemas import interview_schema, job_schema, candidate_schema
 from app.db import get_db
 from app.agents.scheduler import interview_email_agent
-from app.utils.email_sender import send_email
+from app.utils.gmail_helper import send_email
 from app.models import User
 from app.dependencies import get_current_user
 
