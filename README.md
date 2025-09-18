@@ -319,7 +319,7 @@ Please open issues for bugs or feature requests.
 
 ## License
 
-This project is provided under the MIT license. See `LICENSE` for details.
+This project is licensed under the Apache License 2.0 — see the [LICENSE](./LICENSE) file for details.
 
 ---
 
